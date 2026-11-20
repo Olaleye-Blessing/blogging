@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - POSTGRES_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
     volumes:
       - .:/app                    # live code, so dev reloads work
       - /app/node_modules

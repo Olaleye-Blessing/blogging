@@ -4,6 +4,11 @@ interface AppErrorOptions {
   cause?: unknown;
 }
 
+export interface FieldError {
+	field: string;
+	message: string;
+}
+
 export class AppError extends Error {
   readonly status: number;
   readonly code: string;
@@ -29,5 +34,35 @@ export class NotFoundError extends AppError {
 export class UnAuthorizedError extends AppError {
   constructor(message = "Authentication Required") {
     super(401, "unauthorized", message);
+  }
+}
+
+export class ValidationError extends AppError {
+	constructor(errors: FieldError[], message = "Request validation failed") {
+		super(400, "validation_failed", message, { details: errors });
+	}
+}
+
+export class TooManyRequestsError extends AppError {
+	constructor(message = "Too many requests, please try again later.") {
+		super(429, "too_many_requests", message);
+	}
+}
+
+export class InternalServerError extends AppError {
+	constructor(message = "Internal server error, please try again later.") {
+		super(500, "unknown", message);
+	}
+}
+
+export class CsrfError extends AppError {
+  constructor(message = "CRSF token is invalid") {
+    super(403, "invalid_csrf_token", message);
+  }
+}
+
+export class BadOriginError extends AppError {
+  constructor() {
+    super(403, "bad_origin", "Origin not allowed");
   }
 }

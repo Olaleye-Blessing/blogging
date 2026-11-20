@@ -1,50 +1,32 @@
 import express from "express";
-import { globalErrorHandler, routeNotFoundHandler } from "./lib/errors/handlers";
+import {
+	globalErrorHandler,
+	routeNotFoundHandler,
+} from "./lib/errors/handlers";
 import { apiRoutes } from "./routes";
-import { pinoHttp } from "pino-http";
-import { logger } from "./lib/logger";
-import { randomUUID } from "node:crypto";
 import { lifecycle } from "./lib/lifecycle";
+import { httpLogger } from "./middlewares/logger";
+import { envData } from "./lib/env";
+import { appCors } from "./middlewares/cors";
 
-const REQUEST_ID = /^[\w-]{1,64}$/;
 const app = express();
+
+if (envData.NODE_ENV === "production") app.set("trust proxy", 1);
 
 app.disable("x-powered-by");
 
-app.use(
-	pinoHttp({
-		logger,
-		genReqId: (req, res) => {
-			const incoming = req.headers["x-request-id"];
-			const id =
-				typeof incoming === "string" && REQUEST_ID.test(incoming)
-					? incoming
-					: randomUUID();
-
-			res.setHeader("X-Request-Id", id);
-
-			return id;
-		},
-		customLogLevel: (_req, res, err) =>
-			err || res.statusCode >= 500
-				? "error"
-				: res.statusCode >= 400
-					? "warn"
-					: "info",
-		autoLogging: {
-			ignore: (req) => req.url?.startsWith("/health") ?? false,
-		},
-	}),
-);
+app.use(httpLogger);
 
 app.use((_req, res, next) => {
 	if (lifecycle.shuttingDown) res.set("Connection", "close");
 	next();
 });
 
+app.use(appCors);
+
 app.use("/api", apiRoutes);
 
 app.use(routeNotFoundHandler);
-app.use(globalErrorHandler)
+app.use(globalErrorHandler);
 
 export { app };

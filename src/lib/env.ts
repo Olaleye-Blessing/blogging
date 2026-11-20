@@ -9,7 +9,10 @@ const envSchema = z.object({
 		// .enum(["debug", "error", "fatal", "info", "silent", "trace", "warn"])
 		.enum(["debug", "info"])
 		.default("debug"),
-	POSTGRES_URL: z.url()
+	DATABASE_URL: z.url(),
+	LOGIN_SESSION_SECRET: z
+		.string()
+		.min(1, "Login session secret is required!"),
 });
 
 const parsed = envSchema.safeParse(process.env);

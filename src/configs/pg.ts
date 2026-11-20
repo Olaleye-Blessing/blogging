@@ -3,7 +3,7 @@ import { envData } from "../lib/env";
 import { logger } from "../lib/logger";
 
 const pool = new PG.Pool({
-  connectionString: envData.POSTGRES_URL,
+  connectionString: envData.DATABASE_URL,
   max: 15,
 });
 

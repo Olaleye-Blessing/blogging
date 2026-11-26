@@ -9,6 +9,7 @@ import { requireCsrf } from "../middlewares/csrf";
 import rateLimit from "express-rate-limit";
 import { baseRateLimit } from "../lib/rate-limit";
 import { ONE_MINUTE } from "../utils/time-units";
+import { postRoutes } from "./post";
 
 const csrfLimiter = rateLimit({
 	...baseRateLimit,
@@ -30,23 +31,4 @@ apiRoutes.use(requireCsrf);
 
 apiRoutes.use("/auth", authRoutes);
 
-apiRoutes.get("/posts", authenticated, (req, res, next) => {
-  sendResponse({
-    data: "[GET] Posts",
-    res,
-  })
-})
-
-apiRoutes.post("/posts", authenticated, (req, res, next) => {
-  sendResponse({
-    data: "[POST] Posts",
-    res,
-  })
-})
-
-apiRoutes.delete("/posts", authenticated, (req, res, next) => {
-  sendResponse({
-    data: "[DELETE] Posts",
-    res,
-  })
-})
+apiRoutes.use("/posts", postRoutes);
